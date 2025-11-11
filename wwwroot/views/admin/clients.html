@@ -1,0 +1,310 @@
+﻿<div class="container-fluid"  ng-controller="AdminClientsController">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Client Management</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <button class="btn btn-primary me-2" ng-click="showCreateForm()">
+                <i class="fas fa-user-plus"></i> Create Client
+            </button>
+            <button class="btn btn-outline-secondary" ng-click="loadClients()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" placeholder="Search clients..."
+                       ng-model="searchTerm" ng-change="filterClients()">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" ng-model="statusFilter" ng-change="filterClients()">
+                <option value="">All Status</option>
+                <option value="active">Active Only</option>
+                <option value="inactive">Inactive Only</option>
+            </select>
+        </div>
+        <div class="col-md-5 text-end">
+            <span class="badge bg-primary me-2">Total: {{clients.length}}</span>
+            <span class="badge bg-success me-2">Active: {{(clients | filter:{isActive:true}).length}}</span>
+            <span class="badge bg-secondary">Showing: {{filteredClients.length}}</span>
+        </div>
+    </div>
+
+    <!-- Clients Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-users"></i> Clients List
+            </h5>
+        </div>
+        <div class="card-body">
+            <div ng-show="filteredClients.length === 0" class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No clients found</h5>
+                <p class="text-muted" ng-show="clients.length === 0">
+                    Create your first client to get started.
+                </p>
+                <p class="text-muted" ng-show="clients.length > 0">
+                    Try adjusting your search or filter criteria.
+                </p>
+                <button class="btn btn-primary" ng-click="showCreateForm()" ng-show="clients.length === 0">
+                    <i class="fas fa-user-plus"></i> Create First Client
+                </button>
+            </div>
+
+            <div ng-show="filteredClients.length > 0" class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Client Info</th>
+                            <th>Company</th>
+                            <th>Credits</th>
+                            <th>API Key</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="client in filteredClients">
+                            <td>
+                                <div>
+                                    <strong>{{client.username}}</strong>
+                                    <br>
+                                    <small class="text-muted">{{client.email}}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div ng-show="client.companyName">
+                                    <strong>{{client.companyName}}</strong>
+                                    <br>
+                                    <small class="text-muted">{{client.contactPerson}}</small>
+                                </div>
+                                <span ng-show="!client.companyName" class="text-muted">Not specified</span>
+                            </td>
+                            <td>
+                                <span class="credit-balance" ng-class="{
+                                      'text-success' : client.creditBalance>
+                                    10,
+                                    'text-warning': client.creditBalance <= 10 && client.creditBalance > 1,
+                                    'text-danger': client.creditBalance <= 1
+                                    }">
+                                    {{client.creditBalance | currency}}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <code class="text-truncate-custom">{{client.apiKey}}</code>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1"
+                                            ng-click="copyToClipboard(client.apiKey, 'API Key')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge" ng-class="client.isActive ? 'bg-success' : 'bg-danger'">
+                                    <i class="fas" ng-class="client.isActive ? 'fa-check' : 'fa-times'"></i>
+                                    {{client.isActive ? 'Active' : 'Inactive'}}
+                                </span>
+                            </td>
+                            <td>
+                                <small>{{client.createdAt | dateFormat}}</small>
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-primary dropdown-toggle"
+                                            type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-cog"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" href="#" ng-click="showEditForm(client)">
+                                                <i class="fas fa-edit"></i> Edit Client
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#" ng-click="rechargeCredits(client)">
+                                                <i class="fas fa-credit-card"></i> Recharge Credits
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="#" ng-click="regenerateApiKey(client)">
+                                                <i class="fas fa-key"></i> Regenerate API Key
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#" ng-click="resetPassword(client)">
+                                                <i class="fas fa-lock"></i> Reset Password
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="#" ng-click="toggleClientStatus(client)">
+                                                <i class="fas" ng-class="client.isActive ? 'fa-ban' : 'fa-check'"></i>
+                                                {{client.isActive ? 'Deactivate' : 'Activate'}}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#" ng-click="viewClientStats(client)">
+                                                <i class="fas fa-chart-bar"></i> View Statistics
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Client Modal -->
+<div class="modal fade" id="clientModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas" ng-class="formMode === 'create' ? 'fa-user-plus' : 'fa-user-edit'"></i>
+                    {{formMode === 'create' ? 'Create New Client' : 'Edit Client'}}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form ng-submit="saveClient()">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Username *</label>
+                                <input type="text" class="form-control" ng-model="clientForm.username"
+                                       ng-disabled="formMode === 'edit'" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Email *</label>
+                                <input type="email" class="form-control" ng-model="clientForm.email" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Company Name</label>
+                                <input type="text" class="form-control" ng-model="clientForm.companyName">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Contact Person</label>
+                                <input type="text" class="form-control" ng-model="clientForm.contactPerson">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="text" class="form-control" ng-model="clientForm.phone">
+                            </div>
+                        </div>
+                        <div class="col-md-6" ng-show="formMode === 'create'">
+                            <div class="mb-3">
+                                <label class="form-label">Initial Credits</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" ng-model="clientForm.initialCredits"
+                                           min="0" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-control" rows="2" ng-model="clientForm.address"></textarea>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary" ng-disabled="formLoading">
+                            <i class="fas" ng-class="formMode === 'create' ? 'fa-user-plus' : 'fa-save'"></i>
+                            <span ng-show="!formLoading">{{formMode === 'create' ? 'Create Client' : 'Update Client'}}</span>
+                            <span ng-show="formLoading">{{formMode === 'create' ? 'Creating...' : 'Updating...'}}</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Credentials Modal -->
+<div class="modal fade" id="credentialsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-key"></i> Client Credentials
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Important:</strong> Save these credentials securely. You won't be able to see them again.
+                </div>
+
+                <div class="mb-3" ng-show="newCredentials.username">
+                    <label class="form-label">Username</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="{{newCredentials.username}}" readonly>
+                        <button class="btn btn-outline-secondary" ng-click="copyToClipboard(newCredentials.username, 'Username')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-3" ng-show="newCredentials.password">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="{{newCredentials.password}}" readonly>
+                        <button class="btn btn-outline-secondary" ng-click="copyToClipboard(newCredentials.password, 'Password')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-3" ng-show="newCredentials.apiKey">
+                    <label class="form-label">API Key</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="{{newCredentials.apiKey}}" readonly>
+                        <button class="btn btn-outline-secondary" ng-click="copyToClipboard(newCredentials.apiKey, 'API Key')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-3" ng-show="newCredentials.apiSecret">
+                    <label class="form-label">API Secret</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="{{newCredentials.apiSecret}}" readonly>
+                        <button class="btn btn-outline-secondary" ng-click="copyToClipboard(newCredentials.apiSecret, 'API Secret')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

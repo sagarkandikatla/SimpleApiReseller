@@ -1,0 +1,303 @@
+﻿<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">API Documentation</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <button class="btn btn-outline-primary" ng-click="downloadPostman()">
+                <i class="fas fa-download"></i> Download Postman Collection
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Navigation -->
+        <div class="col-lg-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-list"></i> Contents
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <nav class="nav nav-pills flex-column">
+                        <a class="nav-link" href="#getting-started">Getting Started</a>
+                        <a class="nav-link" href="#authentication">Authentication</a>
+                        <a class="nav-link" href="#making-requests">Making Requests</a>
+                        <a class="nav-link" href="#response-format">Response Format</a>
+                        <a class="nav-link" href="#error-handling">Error Handling</a>
+                        <a class="nav-link" href="#examples">Examples</a>
+                        <a class="nav-link" href="#rate-limits">Rate Limits</a>
+                        <a class="nav-link" href="#best-practices">Best Practices</a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="col-lg-9">
+            <!-- Getting Started -->
+            <section id="getting-started">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-rocket"></i> Getting Started</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>Welcome to the API Reseller System! This system acts as a proxy to forward your requests to our target API while managing your usage and billing.</p>
+
+                        <h6>Quick Start</h6>
+                        <ol>
+                            <li>Get your API key from your dashboard</li>
+                            <li>Ensure you have sufficient credits</li>
+                            <li>Make requests to our proxy endpoints</li>
+                            <li>Monitor your usage and costs</li>
+                        </ol>
+
+                        <div class="alert alert-info">
+                            <strong>Base URL:</strong> <code>{{apiBaseUrl}}/api/proxy</code>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Authentication -->
+            <section id="authentication">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-key"></i> Authentication</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>All API requests must include your API key in the request headers.</p>
+
+                        <h6>Header Required</h6>
+                        <pre class="bg-light p-3 rounded"><code>X-API-Key: YOUR_API_KEY</code></pre>
+
+                        <div class="alert alert-warning">
+                            <strong>Important:</strong> Keep your API key secure and never share it publicly. Each request consumes credits from your account.
+                        </div>
+
+                        <div ng-show="currentUser.role === 'Client'">
+                            <h6>Your API Key</h6>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" value="{{userApiKey}}" readonly>
+                                <button class="btn btn-outline-secondary" ng-click="copyApiKey()">
+                                    <i class="fas fa-copy"></i> Copy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Making Requests -->
+            <section id="making-requests">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-exchange-alt"></i> Making Requests</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>Our proxy supports all HTTP methods and forwards them to the target API.</p>
+
+                        <h6>Supported Methods</h6>
+                        <ul>
+                            <li><span class="badge bg-primary">GET</span> - Retrieve data</li>
+                            <li><span class="badge bg-success">POST</span> - Create new resources</li>
+                            <li><span class="badge bg-warning">PUT</span> - Update existing resources</li>
+                            <li><span class="badge bg-info">PATCH</span> - Partial updates</li>
+                            <li><span class="badge bg-danger">DELETE</span> - Remove resources</li>
+                        </ul>
+
+                        <h6>Request Format</h6>
+                        <pre class="bg-light p-3 rounded"><code>{{apiBaseUrl}}/api/proxy/[target-endpoint]</code></pre>
+
+                        <p>Simply replace <code>[target-endpoint]</code> with the endpoint you want to access on the target API.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Response Format -->
+            <section id="response-format">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-code"></i> Response Format</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>Responses are returned exactly as received from the target API, with the same status codes and content types.</p>
+
+                        <h6>Success Response</h6>
+                        <pre class="bg-light p-3 rounded"><code>{
+  "id": 1,
+  "title": "Sample Post",
+  "body": "This is a sample response from the target API",
+  "userId": 1
+}</code></pre>
+
+                        <h6>Headers Preserved</h6>
+                        <ul>
+                            <li>Content-Type</li>
+                            <li>Cache-Control</li>
+                            <li>Custom headers from target API</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error Handling -->
+            <section id="error-handling">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Error Handling</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>Our system returns specific error codes for different scenarios:</p>
+
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Status Code</th>
+                                        <th>Error</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="badge bg-danger">401</span></td>
+                                        <td>Unauthorized</td>
+                                        <td>Missing or invalid API key</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge bg-warning">429</span></td>
+                                        <td>Insufficient Credits</td>
+                                        <td>Not enough credits to process request</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge bg-info">502</span></td>
+                                        <td>Bad Gateway</td>
+                                        <td>Target API is unavailable</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge bg-secondary">408</span></td>
+                                        <td>Request Timeout</td>
+                                        <td>Request took too long to process</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <h6>Error Response Format</h6>
+                        <pre class="bg-light p-3 rounded"><code>{
+  "error": "Insufficient credits",
+  "remaining": 2.45
+}</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Examples -->
+            <section id="examples">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-code"></i> Examples</h4>
+                    </div>
+                    <div class="card-body">
+                        <h6>cURL Examples</h6>
+
+                        <p><strong>GET Request:</strong></p>
+                        <pre class="bg-light p-3 rounded"><code>curl -X GET "{{apiBaseUrl}}/api/proxy/posts/1" \
+  -H "X-API-Key: YOUR_API_KEY"</code></pre>
+
+                        <p><strong>POST Request:</strong></p>
+                        <pre class="bg-light p-3 rounded"><code>curl -X POST "{{apiBaseUrl}}/api/proxy/posts" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "New Post",
+    "body": "Post content",
+    "userId": 1
+  }'</code></pre>
+
+                        <h6>JavaScript Examples</h6>
+                        <pre class="bg-light p-3 rounded"><code>// Using fetch API
+fetch('{{apiBaseUrl}}/api/proxy/posts', {
+  method: 'GET',
+  headers: {
+    'X-API-Key': 'YOUR_API_KEY'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));</code></pre>
+
+                        <h6>Python Examples</h6>
+                        <pre class="bg-light p-3 rounded"><code>import requests
+
+headers = {'X-API-Key': 'YOUR_API_KEY'}
+response = requests.get('{{apiBaseUrl}}/api/proxy/posts', headers=headers)
+data = response.json()</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Rate Limits -->
+            <section id="rate-limits">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-tachometer-alt"></i> Rate Limits & Costs</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>Each API request consumes credits from your account balance.</p>
+
+                        <h6>Current Pricing</h6>
+                        <div class="alert alert-info">
+                            <strong>Cost per request:</strong> {{requestCost | currency}}
+                        </div>
+
+                        <h6>Usage Monitoring</h6>
+                        <ul>
+                            <li>Monitor your balance in the dashboard</li>
+                            <li>View detailed usage statistics</li>
+                            <li>Get low-balance alerts</li>
+                            <li>Track cost per endpoint</li>
+                        </ul>
+
+                        <div class="alert alert-warning">
+                            <strong>Note:</strong> Requests that fail due to target API errors still consume credits.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Best Practices -->
+            <section id="best-practices">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-lightbulb"></i> Best Practices</h4>
+                    </div>
+                    <div class="card-body">
+                        <h6>Security</h6>
+                        <ul>
+                            <li>Never expose your API key in client-side code</li>
+                            <li>Use environment variables to store your API key</li>
+                            <li>Regenerate your API key if compromised</li>
+                            <li>Monitor usage for unusual activity</li>
+                        </ul>
+
+                        <h6>Performance</h6>
+                        <ul>
+                            <li>Implement proper error handling</li>
+                            <li>Use appropriate HTTP methods</li>
+                            <li>Handle timeouts gracefully</li>
+                            <li>Monitor response times</li>
+                        </ul>
+
+                        <h6>Cost Optimization</h6>
+                        <ul>
+                            <li>Cache responses when appropriate</li>
+                            <li>Avoid unnecessary API calls</li>
+                            <li>Monitor your daily usage</li>
+                            <li>Set up balance alerts</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

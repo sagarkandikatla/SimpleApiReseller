@@ -1,0 +1,277 @@
+﻿<div class="container-fluid" ng-controller="ClientDashboardController">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Admin Dashboard</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <button class="btn btn-sm btn-outline-secondary" ng-click="refreshData()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card stat-primary">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="stat-label text-uppercase mb-1">Total Clients</div>
+                            <div class="stat-number">{{dashboardStats.totalClients}}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card stat-success">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="stat-label text-uppercase mb-1">Active Clients</div>
+                            <div class="stat-number">{{dashboardStats.activeClients}}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-check fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card stat-info">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="stat-label text-uppercase mb-1">Request Cost</div>
+                            <div class="stat-number">{{systemSettings.requestCost | currency}}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card stat-warning">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="stat-label text-uppercase mb-1">Total Credits</div>
+                            <div class="stat-number">{{dashboardStats.totalCredits | currency}}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-wallet fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Clients -->
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-users"></i> Recent Clients
+                    </h5>
+                    <a href="#/admin/clients" class="btn btn-sm btn-primary">
+                        <i class="fas fa-eye"></i> View All
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div ng-show="recentClients.length === 0" class="text-center text-muted py-4">
+                        <i class="fas fa-users fa-3x mb-3"></i>
+                        <p>No clients found</p>
+                        <a href="#/admin/clients" class="btn btn-outline-primary">
+                            <i class="fas fa-plus"></i> Create First Client
+                        </a>
+                    </div>
+
+                    <div ng-show="recentClients.length > 0">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Client</th>
+                                        <th>Company</th>
+                                        <th>Credits</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="client in recentClients | limitTo:5">
+                                        <td>
+                                            <strong>{{client.username}}</strong><br>
+                                            <small class="text-muted">{{client.email}}</small>
+                                        </td>
+                                        <td>{{client.companyName || 'N/A'}}</td>
+                                        <td>
+                                            <span class="credit-balance" ng-class="{
+                                                  'text-success' : client.creditBalance>
+                                                10,
+                                                'text-warning': client.creditBalance <= 10 && client.creditBalance > 1,
+                                                'text-danger': client.creditBalance <= 1
+                                                }">
+                                                {{client.creditBalance | currency}}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge" ng-class="client.isActive ? 'bg-success' : 'bg-danger'">
+                                                {{client.isActive ? 'Active' : 'Inactive'}}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small>{{client.createdAt | dateFormat}}</small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" ng-click="viewClient(client.id)">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-outline-success" ng-click="rechargeClient(client)">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#/admin/clients" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Create New Client
+                        </a>
+                        <a href="#/admin/settings" class="btn btn-outline-primary">
+                            <i class="fas fa-cog"></i> System Settings
+                        </a>
+                        <button class="btn btn-outline-success" ng-click="showRechargeModal()">
+                            <i class="fas fa-credit-card"></i> Bulk Recharge
+                        </button>
+                        <button class="btn btn-outline-info" ng-click="exportData()">
+                            <i class="fas fa-download"></i> Export Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-server"></i> System Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>API Service</span>
+                            <span class="badge bg-success">
+                                <i class="fas fa-check"></i> Online
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Database</span>
+                            <span class="badge bg-success">
+                                <i class="fas fa-check"></i> Connected
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Last Updated</span>
+                            <small class="text-muted">{{systemSettings.lastUpdated | dateTimeFormat}}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Credit Clients Alert -->
+    <div ng-show="lowCreditClients.length > 0" class="alert alert-warning">
+        <h6><i class="fas fa-exclamation-triangle"></i> Low Credit Alert</h6>
+        <p class="mb-2">The following clients have low credit balances:</p>
+        <div class="row">
+            <div class="col-md-6" ng-repeat="client in lowCreditClients">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>{{client.username}} ({{client.companyName}})</span>
+                    <span class="text-danger">{{client.creditBalance | currency}}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recharge Modal -->
+<div class="modal fade" id="rechargeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-credit-card"></i> Recharge Credits
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form ng-submit="processRecharge()">
+                    <div class="mb-3">
+                        <label class="form-label">Client</label>
+                        <select class="form-select" ng-model="rechargeForm.clientId" required>
+                            <option value="">Select a client...</option>
+                            <option ng-repeat="client in allClients" value="{{client.id}}">
+                                {{client.username}} - {{client.companyName}} ({{client.creditBalance | currency}})
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Amount</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" ng-model="rechargeForm.amount"
+                                   min="0.01" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <input type="text" class="form-control" ng-model="rechargeForm.description"
+                               placeholder="Optional description">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success" ng-disabled="rechargeLoading">
+                            <i class="fas fa-credit-card"></i>
+                            <span ng-show="!rechargeLoading">Recharge Credits</span>
+                            <span ng-show="rechargeLoading">Processing...</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

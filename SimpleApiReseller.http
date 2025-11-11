@@ -1,0 +1,6 @@
+@SimpleApiReseller_HostAddress = http://localhost:5291
+
+GET {{SimpleApiReseller_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

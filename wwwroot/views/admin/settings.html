@@ -1,0 +1,182 @@
+﻿<div class="container-fluid" ng-controller="AdminSettingsController">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">System Settings</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <button class="btn btn-outline-secondary" ng-click="loadSettings()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Settings -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-cog"></i> Pricing Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form ng-submit="saveSettings()">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Cost per API Request</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control"
+                                               ng-model="settingsForm.requestCost"
+                                               min="0" step="0.0001" required>
+                                    </div>
+                                    <div class="form-text">
+                                        This amount will be deducted from client credits for each API request.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Current Value</label>
+                                    <div class="form-control-plaintext">
+                                        <strong>{{settings.requestCost | currency}}</strong>
+                                        <small class="text-muted d-block">
+                                            Last updated: {{settings.lastUpdated | dateTimeFormat}}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h6>Pricing Examples</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Requests</th>
+                                            <th>Cost (Current)</th>
+                                            <th>Cost (New)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>100</td>
+                                            <td>{{(100 * settings.requestCost) | currency}}</td>
+                                            <td>{{(100 * settingsForm.requestCost) | currency}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>1,000</td>
+                                            <td>{{(1000 * settings.requestCost) | currency}}</td>
+                                            <td>{{(1000 * settingsForm.requestCost) | currency}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>10,000</td>
+                                            <td>{{(10000 * settings.requestCost) | currency}}</td>
+                                            <td>{{(10000 * settingsForm.requestCost) | currency}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-warning" ng-click="resetToDefaults()">
+                                <i class="fas fa-undo"></i> Reset to Defaults
+                            </button>
+                            <button type="submit" class="btn btn-primary" ng-disabled="saveLoading">
+                                <i class="fas fa-save"></i>
+                                <span ng-show="!saveLoading">Save Settings</span>
+                                <span ng-show="saveLoading">Saving...</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Information -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i> System Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Application</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Name:</strong> API Reseller System</li>
+                            <li><strong>Version:</strong> 1.0.0</li>
+                            <li><strong>Environment:</strong> Development</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6>Database</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Type:</strong> MySQL</li>
+                            <li>
+                                <strong>Status:</strong>
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check"></i> Connected
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6>Current Settings</h6>
+                        <ul class="list-unstyled">
+                            <li ng-repeat="setting in settings.allSettings">
+                                <strong>{{setting.key}}:</strong> {{setting.value}}
+                                <br>
+                                <small class="text-muted">Updated: {{setting.updatedAt | dateFormat}}</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary" ng-click="viewSystemLogs()">
+                            <i class="fas fa-file-alt"></i> View System Logs
+                        </button>
+                        <button class="btn btn-outline-info" ng-click="exportSettings()">
+                            <i class="fas fa-download"></i> Export Settings
+                        </button>
+                        <button class="btn btn-outline-warning" ng-click="clearCache()">
+                            <i class="fas fa-trash"></i> Clear Cache
+                        </button>
+                        <button class="btn btn-outline-danger" ng-click="restartService()">
+                            <i class="fas fa-power-off"></i> Restart Service
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Messages -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h6><i class="fas fa-info-circle"></i> Important Notes</h6>
+                <ul class="mb-0">
+                    <li>Changes to pricing will affect all future API requests immediately</li>
+                    <li>Existing client credits are not affected by pricing changes</li>
+                    <li>Consider notifying clients before making significant pricing changes</li>
+                    <li>System settings are automatically backed up daily</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

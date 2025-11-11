@@ -1,0 +1,186 @@
+﻿<div class="container-fluid" ng-controller="ClientCreditsController">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Credit Balance & Transactions</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <button class="btn btn-sm btn-outline-secondary" ng-click="loadBalance(); loadTransactions()">
+                <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Current Balance Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 class="text-muted mb-2">Current Balance</h3>
+                    <h1 class="display-4" ng-class="{
+                        'text-success' : balance.creditBalance>
+                        10,
+                        'text-warning': balance.creditBalance <= 10 && balance.creditBalance > 1,
+                        'text-danger': balance.creditBalance <= 1
+                        }">
+                        {{balance.creditBalance | currency}}
+                    </h1>
+                    <p class="text-muted">
+                        <i class="fas fa-info-circle"></i>
+                        Contact admin to recharge your credits
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Filters -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-filter"></i> Filter Transactions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group w-100" role="group">
+                        <button type="button"
+                                class="btn"
+                                ng-class="selectedType === '' ? 'btn-primary' : 'btn-outline-primary'"
+                                ng-click="filterByType('')">
+                            All Transactions
+                        </button>
+                        <button type="button"
+                                class="btn"
+                                ng-class="selectedType === 'Recharge' ? 'btn-success' : 'btn-outline-success'"
+                                ng-click="filterByType('Recharge')">
+                            Recharges
+                        </button>
+                        <button type="button"
+                                class="btn"
+                                ng-class="selectedType === 'Usage' ? 'btn-secondary' : 'btn-outline-secondary'"
+                                ng-click="filterByType('Usage')">
+                            Usage
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info"></i> Transaction Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h6 class="text-muted">Total Count</h6>
+                            <h5>{{pagination.totalCount || 0}}</h5>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-muted">Showing</h6>
+                            <h5>{{transactions.length || 0}}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-list"></i> Transaction History
+            </h5>
+        </div>
+        <div class="card-body">
+            <div ng-show="transactions.length === 0" class="text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No transactions found</h5>
+                <p class="text-muted">
+                    <span ng-show="selectedType === ''">You haven't made any transactions yet.</span>
+                    <span ng-show="selectedType === 'Recharge'">No recharge transactions found.</span>
+                    <span ng-show="selectedType === 'Usage'">No usage transactions found.</span>
+                </p>
+            </div>
+
+            <div ng-show="transactions.length > 0">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="transaction in transactions">
+                                <td>
+                                    <small>{{transaction.createdAt | dateTimeFormat}}</small>
+                                </td>
+                                <td>
+                                    <span class="badge" ng-class="{
+                                        'bg-success': transaction.transactionType === 'Recharge',
+                                        'bg-secondary': transaction.transactionType === 'Usage'
+                                    }">
+                                        <i class="fas" ng-class="{
+                                            'fa-plus': transaction.transactionType === 'Recharge',
+                                            'fa-minus': transaction.transactionType === 'Usage'
+                                        }"></i>
+                                        {{transaction.transactionType}}
+                                    </span>
+                                </td>
+                                <td>
+                                    {{transaction.description || 'No description'}}
+                                </td>
+                                <td class="text-end">
+                                    <strong ng-class="{
+                                            'text-success' : transaction.amount>
+                                        0,
+                                        'text-danger': transaction.amount < 0
+                                        }">
+                                        {{transaction.amount >= 0 ? '+' : ''}}{{transaction.amount | currency}}
+                                    </strong>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav ng-show="pagination.totalPages > 1">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" ng-class="{disabled: currentPage <= 1}">
+                            <button class="page-link" ng-click="loadTransactions(currentPage - 1)" ng-disabled="currentPage <= 1">
+                                <i class="fas fa-angle-left"></i> Previous
+                            </button>
+                        </li>
+
+                        <li class="page-item" ng-repeat="page in getPages()" ng-class="{active: page === currentPage}">
+                            <button class="page-link" ng-click="loadTransactions(page)">
+                                {{page}}
+                            </button>
+                        </li>
+
+                        <li class="page-item" ng-class="{disabled: currentPage >= pagination.totalPages}">
+                            <button class="page-link" ng-click="loadTransactions(currentPage + 1)" ng-disabled="currentPage >= pagination.totalPages">
+                                Next <i class="fas fa-angle-right"></i>
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="text-center text-muted">
+                        <small>
+                            Showing {{(currentPage - 1) * pagination.pageSize + 1}} to
+                            {{Math.min(currentPage * pagination.pageSize, pagination.totalCount)}}
+                            of {{pagination.totalCount}} transactions
+                        </small>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
