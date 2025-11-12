@@ -33,7 +33,9 @@
 
         // Admin API methods
         this.getClients = function () {
-            return this.get('/clients');
+            return this.get('/clients').then(function (response) {
+                return response; // Return response for promise chain
+            });
         };
 
         this.createClient = function (clientData) {

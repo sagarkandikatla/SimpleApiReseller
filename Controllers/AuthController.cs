@@ -32,29 +32,20 @@ namespace ApiResellerSystem.Controllers
                     .Include(u => u.Client)
                     .FirstOrDefaultAsync(u => u.Username == loginDto.Username && u.IsActive);
 
-                Console.WriteLine($"Login attempt for user: {loginDto.Username} at {DateTime.UtcNow}");
-                Console.WriteLine($"Input password: {loginDto.Password}");
-                Console.WriteLine($"User found: {user != null}");
-
-                if (user != null)
+                // ADD THIS CHECK
+                if (user == null)
                 {
-                    Console.WriteLine($"DB password hash: {user.PasswordHash}");
-                    Console.WriteLine($"User role: {user.Role}");
-                    Console.WriteLine($"User active: {user.IsActive}");
-
-                    var passwordMatch = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
-                    Console.WriteLine($"Password verification result: {passwordMatch}");
+                    return Unauthorized(new { message = "Invalid username or password" });
                 }
-                else
+
+                // ADD THIS CHECK
+                if (!BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
                 {
-                    Console.WriteLine("User not found in database");
+                    return Unauthorized(new { message = "Invalid username or password" });
                 }
 
                 var token = GenerateJwtToken(user);
-                //convert object to json
-                var json = Newtonsoft.Json.JsonConvert.SerializeObject(user);
 
-                Console.WriteLine("json:" + json);
                 return Ok(new LoginResponseDto
                 {
                     Token = token,
@@ -70,7 +61,6 @@ namespace ApiResellerSystem.Controllers
                 return StatusCode(500, new { message = "Login failed", error = ex.Message });
             }
         }
-
         //[HttpPost("register")]
         //public async Task<ActionResult<LoginResponseDto>> Register(CreateClientDto registerDto)
         //{

@@ -1,4 +1,4 @@
-﻿angular.module('apiResellerApp').controller('NavController', ['$scope', '$location', '$uibModal', 'AuthService', function ($scope, $location, $uibModal, AuthService) {
+﻿angular.module('apiResellerApp').controller('NavController', ['$scope', '$location',   'AuthService', function ($scope, $location , AuthService) {
 
         $scope.logout = function () {
             if (confirm('Are you sure you want to logout?')) {

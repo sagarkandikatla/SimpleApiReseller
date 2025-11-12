@@ -8,7 +8,7 @@ namespace SimpleApiReseller.Models
         public string SettingKey { get; set; } = string.Empty;
         public string SettingValue { get; set; } = string.Empty;
         // Change this line:
-        [Column(TypeName = "timestamp")]
+        //[Column(TypeName = "timestamp")]
         public DateTime UpdatedAt { get; set; }
 
     }

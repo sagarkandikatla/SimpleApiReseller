@@ -25,6 +25,7 @@ namespace ApiResellerSystem.DTOs
         public string? ContactPerson { get; set; }
         public string? Phone { get; set; }
         public string? Address { get; set; }
+        public decimal? InitialCredits { get; set; }
     }
 
     public class UpdateClientDto
