@@ -58,6 +58,7 @@
         $scope.currentPage = 1;
         $scope.pageSize = 20;
         $scope.selectedType = '';
+        $scope.Math = window.Math; // ADD THIS LINE
 
         $scope.loadBalance = function () {
             ApiService.getMyCreditBalance()
