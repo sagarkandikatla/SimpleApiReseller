@@ -12,18 +12,14 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 
-    <!-- AngularJS -->
-    <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.min.js"></script>-->
-
     <!-- Chart.js for statistics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary" ng-controller="NavController" ng-show="currentUser">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary" ng-controller="NavController" ng-if="currentUser">
         <div class="container">
-            <a class="navbar-brand" href="#/">
+            <a class="navbar-brand" href="#!/">
                 <i class="fas fa-api"></i> API Reseller
             </a>
 
@@ -34,42 +30,42 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <!-- Admin Menu -->
-                    <li class="nav-item" ng-show="currentUser.role === 'Admin'">
-                        <a class="nav-link" href="#/admin/dashboard">
+                    <li class="nav-item" ng-if="currentUser.role === 'Admin'">
+                        <a class="nav-link" href="#!/admin/dashboard">
                             <i class="fas fa-tachometer-alt"></i> Dashboard
                         </a>
                     </li>
-                    <li class="nav-item" ng-show="currentUser.role === 'Admin'">
-                        <a class="nav-link" href="#/admin/clients">
+                    <li class="nav-item" ng-if="currentUser.role === 'Admin'">
+                        <a class="nav-link" href="#!/admin/clients">
                             <i class="fas fa-users"></i> Clients
                         </a>
                     </li>
-                    <li class="nav-item" ng-show="currentUser.role === 'Admin'">
-                        <a class="nav-link" href="#/admin/settings">
+                    <li class="nav-item" ng-if="currentUser.role === 'Admin'">
+                        <a class="nav-link" href="#!/admin/settings">
                             <i class="fas fa-cog"></i> Settings
                         </a>
                     </li>
 
                     <!-- Client Menu -->
-                    <li class="nav-item" ng-show="currentUser.role === 'Client'">
-                        <a class="nav-link" href="#/client/dashboard">
+                    <li class="nav-item" ng-if="currentUser.role === 'Client'">
+                        <a class="nav-link" href="#!/client/dashboard">
                             <i class="fas fa-tachometer-alt"></i> Dashboard
                         </a>
                     </li>
-                    <li class="nav-item" ng-show="currentUser.role === 'Client'">
-                        <a class="nav-link" href="#/client/credits">
+                    <li class="nav-item" ng-if="currentUser.role === 'Client'">
+                        <a class="nav-link" href="#!/client/credits">
                             <i class="fas fa-wallet"></i> Credits
                         </a>
                     </li>
-                    <li class="nav-item" ng-show="currentUser.role === 'Client'">
-                        <a class="nav-link" href="#/client/statistics">
+                    <li class="nav-item" ng-if="currentUser.role === 'Client'">
+                        <a class="nav-link" href="#!/client/statistics">
                             <i class="fas fa-chart-bar"></i> Statistics
                         </a>
                     </li>
 
                     <!-- Common Menu -->
                     <li class="nav-item">
-                        <a class="nav-link" href="#/documentation">
+                        <a class="nav-link" href="#!/documentation">
                             <i class="fas fa-book"></i> API Docs
                         </a>
                     </li>
@@ -77,19 +73,19 @@
 
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fas fa-user"></i> {{currentUser.username}}
                             <span class="badge bg-secondary ms-1">{{currentUser.role}}</span>
                         </a>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li>
-                                <a class="dropdown-item" href="#" ng-click="changePassword()">
+                                <a class="dropdown-item" href="#" ng-click="changePassword(); $event.preventDefault();">
                                     <i class="fas fa-key"></i> Change Password
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item" href="#" ng-click="logout()">
+                                <a class="dropdown-item" href="#" ng-click="logout(); $event.preventDefault();">
                                     <i class="fas fa-sign-out-alt"></i> Logout
                                 </a>
                             </li>
@@ -119,20 +115,21 @@
         <div ng-view></div>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/2.5.6/ui-bootstrap-tpls.min.js"></script>
+    <!-- Bootstrap JS (must come before AngularJS) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="js/app.js?vc=0.0.5"></script>
-    <script src="js/services/authService.js?vc=0.0.5"></script>
-    <script src="js/services/apiService.js?vc=0.0.5"></script>
-    <script src="js/controllers/navController.js?vc=0.0.5"></script>
-    <script src="js/controllers/loginController.js?vc=0.0.5"></script>
-    <script src="js/controllers/adminController.js?vc=0.0.5"></script>
-    <script src="js/controllers/clientController.js?vc=0.0.5"></script>
-    <!-- Add this line in index.html after other controller scripts -->
-    <script src="js/controllers/documentationController.js?vc=0.0.5"></script>
-    <!-- Add before closing </body> tag in index.html -->
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.min.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/app.js?vc=0.0.7"></script>
+    <script src="js/services/authService.js?vc=0.0.7"></script>
+    <script src="js/services/apiService.js?vc=0.0.7"></script>
+    <script src="js/controllers/navController.js?vc=0.0.7"></script>
+    <script src="js/controllers/loginController.js?vc=0.0.7"></script>
+    <script src="js/controllers/adminController.js?vc=0.0.7"></script>
+    <script src="js/controllers/clientController.js?vc=0.0.7"></script>
+    <script src="js/controllers/documentationController.js?vc=0.0.7"></script>
 </body>
 </html>

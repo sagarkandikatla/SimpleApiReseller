@@ -35,6 +35,7 @@ namespace ApiResellerSystem.Data
                       .HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.UpdatedAt).HasColumnName("updated_at")
                       .HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP");
+                entity.Property(e => e.LastLoginAt).HasColumnName("LastLoginAt");
 
                 // Add indexes
                 entity.HasIndex(e => e.Username).IsUnique();

@@ -1,50 +1,53 @@
 ﻿// AngularJS App Configuration
-var app = angular.module('apiResellerApp', ['ngRoute', 'ui.bootstrap'])
+var app = angular.module('apiResellerApp', ['ngRoute'])
     .config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
+
+        // Enable HTML5 mode with hashPrefix
+        $locationProvider.hashPrefix('!');
 
         $routeProvider
             .when('/login', {
-                templateUrl: 'views/login.html?vc=0.0.5',
+                templateUrl: 'views/login.html?vc=0.0.7',
                 controller: 'LoginController'
             })
             .when('/admin/dashboard', {
-                templateUrl: 'views/admin/dashboard.html?vc=0.0.5',
+                templateUrl: 'views/admin/dashboard.html?vc=0.0.7',
                 controller: 'AdminDashboardController',
                 requireAuth: true,
                 requireRole: 'Admin'
             })
             .when('/admin/clients', {
-                templateUrl: 'views/admin/clients.html?vc=0.0.5',
+                templateUrl: 'views/admin/clients.html?vc=0.0.7',
                 controller: 'AdminClientsController',
                 requireAuth: true,
                 requireRole: 'Admin'
             })
             .when('/admin/settings', {
-                templateUrl: 'views/admin/settings.html?vc=0.0.5',
+                templateUrl: 'views/admin/settings.html?vc=0.0.7',
                 controller: 'AdminSettingsController',
                 requireAuth: true,
                 requireRole: 'Admin'
             })
             .when('/client/dashboard', {
-                templateUrl: 'views/client/dashboard.html?vc=0.0.5',
+                templateUrl: 'views/client/dashboard.html?vc=0.0.7',
                 controller: 'ClientDashboardController',
                 requireAuth: true,
                 requireRole: 'Client'
             })
             .when('/client/credits', {
-                templateUrl: 'views/client/credits.html?vc=0.0.5',
+                templateUrl: 'views/client/credits.html?vc=0.0.7',
                 controller: 'ClientCreditsController',
                 requireAuth: true,
                 requireRole: 'Client'
             })
             .when('/client/statistics', {
-                templateUrl: 'views/client/statistics.html?vc=0.0.5',
+                templateUrl: 'views/client/statistics.html?vc=0.0.7',
                 controller: 'ClientStatisticsController',
                 requireAuth: true,
                 requireRole: 'Client'
             })
             .when('/documentation', {
-                templateUrl: 'views/documentation.html?vc=0.0.5',
+                templateUrl: 'views/documentation.html?vc=0.0.7',
                 controller: 'DocumentationController',
                 requireAuth: true
             })
@@ -55,14 +58,20 @@ var app = angular.module('apiResellerApp', ['ngRoute', 'ui.bootstrap'])
             .otherwise({ redirectTo: '/' });
 
     }])
-    .run(['$rootScope', '$location', 'AuthService', function ($rootScope, $location, AuthService) {
+    .run(['$rootScope', '$location', '$timeout', 'AuthService', function ($rootScope, $location, $timeout, AuthService) {
         // Global variables
         $rootScope.loading = false;
         $rootScope.alert = {};
 
         // Show alert helper
-        $rootScope.showAlert = function (message, type = 'info') {
+        $rootScope.showAlert = function (message, type) {
+            type = type || 'info';
             $rootScope.alert = { message: message, type: type };
+
+            // Auto-dismiss after 5 seconds
+            $timeout(function () {
+                $rootScope.clearAlert();
+            }, 5000);
         };
 
         // Clear alert helper

@@ -1,5 +1,6 @@
 // Models/User.cs
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiResellerSystem.Models
 {
@@ -22,9 +23,12 @@ namespace ApiResellerSystem.Models
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public DateTime? LastLoginAt { get; set; } // Added this property
 
-        // Navigation property - This should match what's referenced in ApplicationDbContext
+        // FIXED: Match database column name exactly
+        [Column("LastLoginAt")]
+        public DateTime? LastLoginAt { get; set; }
+
+        // Navigation property
         public virtual Client? Client { get; set; }
     }
 

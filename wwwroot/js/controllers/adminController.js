@@ -49,7 +49,7 @@
         };
 
         $scope.viewClient = function (clientId) {
-            window.location.href = '#/admin/clients?id=' + clientId;
+            window.location.href = '#!/admin/clients?id=' + clientId;
         };
 
         $scope.rechargeClient = function (client) {
@@ -298,7 +298,7 @@
         };
 
         $scope.viewClientStats = function (client) {
-            window.open('#/admin/client-stats/' + client.id, '_blank');
+            window.open('#!/admin/client-stats/' + client.id, '_blank');
         };
 
         $scope.copyToClipboard = function (text, label) {
