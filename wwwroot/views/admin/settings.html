@@ -22,15 +22,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Cost per API Request</label>
+                                    <label class="form-label">Cost per API Request (₹)</label>
                                     <div class="input-group">
-                                        <span class="input-group-text">$</span>
+                                        <span class="input-group-text">₹</span>
                                         <input type="number" class="form-control"
                                                ng-model="settingsForm.requestCost"
-                                               min="0" step="0.0001" required>
+                                               min="0" step="0.01" required>
                                     </div>
                                     <div class="form-text">
-                                        This amount will be deducted from client credits for each API request.
+                                        This amount in rupees (₹) will be deducted from client credits for each API request.
                                     </div>
                                 </div>
                             </div>

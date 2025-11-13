@@ -151,12 +151,12 @@ namespace SimpleApiReseller.Controllers
                 }
 
                 // Default cost if setting not found
-                return 0.01m; // Default: 1 cent per request
+                return 1.00m; // Default: 1 cent per request
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error getting request cost: {ex.Message}");
-                return 0.01m; // Fallback to default
+                return 1.00m; // Fallback to default
             }
         }
 

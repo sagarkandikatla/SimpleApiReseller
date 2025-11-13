@@ -585,15 +585,21 @@ namespace SimpleApiReseller.Controllers
         }
 
         [HttpGet("system/settings")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")] // Make sure this attribute is present
         public async Task<ActionResult<object>> GetSystemSettings()
         {
             try
             {
+                // Log who is trying to access
+                var currentUser = HttpContext.User.FindFirst("Username")?.Value;
+                var currentRole = HttpContext.User.FindFirst("Role")?.Value;
+
+                Console.WriteLine($"GetSystemSettings called by: {currentUser} (Role: {currentRole})");
+
                 var settings = await _context.SystemSettings.ToListAsync();
 
                 var requestCostSetting = settings.FirstOrDefault(s => s.SettingKey == "REQUEST_COST");
-                var requestCost = decimal.TryParse(requestCostSetting?.SettingValue, out var cost) ? cost : 0.01m;
+                var requestCost = decimal.TryParse(requestCostSetting?.SettingValue, out var cost) ? cost : 1.00m;
 
                 return Ok(new
                 {
@@ -609,10 +615,10 @@ namespace SimpleApiReseller.Controllers
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error in GetSystemSettings: {ex.Message}");
                 return StatusCode(500, new { message = "Error retrieving system settings", error = ex.Message });
             }
         }
-
         // Helper methods
         private string GenerateApiKey()
         {

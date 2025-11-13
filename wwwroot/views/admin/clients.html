@@ -89,9 +89,9 @@
                             <td>
                                 <span class="credit-balance" ng-class="{
                                       'text-success' : client.creditBalance>
-                                    10,
-                                    'text-warning': client.creditBalance <= 10 && client.creditBalance > 1,
-                                    'text-danger': client.creditBalance <= 1
+                                    1000,
+                                    'text-warning': client.creditBalance <= 1000 && client.creditBalance > 100,
+                                    'text-danger': client.creditBalance <= 100
                                     }">
                                     {{client.creditBalance | currency}}
                                 </span>
@@ -218,11 +218,11 @@
                         </div>
                         <div class="col-md-6" ng-show="formMode === 'create'">
                             <div class="mb-3">
-                                <label class="form-label">Initial Credits</label>
+                                <label class="form-label">Initial Credits (₹)</label>
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+                                    <span class="input-group-text">₹</span>
                                     <input type="number" class="form-control" ng-model="clientForm.initialCredits"
-                                           min="0" step="0.01">
+                                           min="0" step="0.01" placeholder="e.g., 1000">
                                 </div>
                             </div>
                         </div>

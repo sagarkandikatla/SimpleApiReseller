@@ -16,7 +16,14 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="stat-label text-uppercase mb-1">Current Balance</div>
-                            <div class="stat-number">{{balance.creditBalance | currency}}</div>
+                            <h1 class="display-4" ng-class="{
+                                'text-success' : balance.creditBalance>
+                                1000,
+                                'text-warning': balance.creditBalance <= 1000 && balance.creditBalance > 100,
+                                'text-danger': balance.creditBalance <= 100
+                                }">
+                                {{balance.creditBalance | currency}}
+                            </h1>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-wallet fa-2x"></i>

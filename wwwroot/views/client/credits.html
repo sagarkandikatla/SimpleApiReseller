@@ -16,9 +16,9 @@
                     <h3 class="text-muted mb-2">Current Balance</h3>
                     <h1 class="display-4" ng-class="{
                         'text-success' : balance.creditBalance>
-                        10,
-                        'text-warning': balance.creditBalance <= 10 && balance.creditBalance > 1,
-                        'text-danger': balance.creditBalance <= 1
+                        1000,
+                        'text-warning': balance.creditBalance <= 1000 && balance.creditBalance > 100,
+                        'text-danger': balance.creditBalance <= 100
                         }">
                         {{balance.creditBalance | currency}}
                     </h1>

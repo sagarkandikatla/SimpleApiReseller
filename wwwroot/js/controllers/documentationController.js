@@ -3,7 +3,7 @@
         $scope.currentUser = AuthService.getCurrentUser();
         $scope.apiBaseUrl = window.location.origin;
         $scope.userApiKey = 'Loading...';
-        $scope.requestCost = 0.01;
+        $scope.requestCost = 1.00; // Default value in case API fails
 
         // Load user's API key if client
         if ($scope.currentUser && $scope.currentUser.role === 'Client' && $scope.currentUser.clientId) {
@@ -12,23 +12,34 @@
                     $scope.userApiKey = response.data.apiKey;
                 })
                 .catch(function (error) {
+                    console.error('Error loading API key:', error);
                     $scope.userApiKey = 'Error loading API key';
+                });
+        } else if ($scope.currentUser && $scope.currentUser.role === 'Admin') {
+            $scope.userApiKey = 'Admin does not have API key';
+        }
+
+        // FIXED: Only load system settings if user is Admin
+        if ($scope.currentUser && $scope.currentUser.role === 'Admin') {
+            ApiService.getSystemSettings()
+                .then(function (response) {
+                    $scope.requestCost = response.data.requestCost;
+                })
+                .catch(function (error) {
+                    console.error('Could not load system settings:', error);
+                    $scope.requestCost = 1.00; // Fallback to default
                 });
         }
 
-        // Load current request cost
-        ApiService.getSystemSettings()
-            .then(function (response) {
-                $scope.requestCost = response.data.requestCost;
-            })
-            .catch(function (error) {
-                console.log('Could not load system settings');
-            });
-
         $scope.copyApiKey = function () {
-            navigator.clipboard.writeText($scope.userApiKey).then(function () {
-                $scope.$parent.showAlert('API Key copied to clipboard!', 'success');
-            });
+            if ($scope.userApiKey && $scope.userApiKey !== 'Loading...' && $scope.userApiKey !== 'Error loading API key') {
+                navigator.clipboard.writeText($scope.userApiKey).then(function () {
+                    $scope.$parent.showAlert('API Key copied to clipboard!', 'success');
+                }).catch(function (err) {
+                    console.error('Failed to copy:', err);
+                    $scope.$parent.showAlert('Failed to copy API key', 'danger');
+                });
+            }
         };
 
         $scope.downloadPostman = function () {
@@ -45,7 +56,7 @@
                     },
                     {
                         "key": "apiKey",
-                        "value": $scope.userApiKey !== 'Loading...' ? $scope.userApiKey : "YOUR_API_KEY"
+                        "value": $scope.userApiKey !== 'Loading...' && $scope.userApiKey !== 'Error loading API key' ? $scope.userApiKey : "YOUR_API_KEY"
                     }
                 ],
                 "item": [

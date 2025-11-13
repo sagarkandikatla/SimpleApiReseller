@@ -2,17 +2,27 @@
 
     // Client Dashboard Controller
     .controller('ClientDashboardController', ['$scope', 'ApiService', 'AuthService', function ($scope, ApiService, AuthService) {
-        $scope.balance = {};
-        $scope.summary = {};
+        $scope.balance = { creditBalance: 0, recentTransactions: [] };
+        $scope.summary = {
+            today: { requests: 0, creditsUsed: 0 },
+            thisMonth: { requests: 0, creditsUsed: 0 },
+            lifetime: { requests: 0, creditsUsed: 0 }
+        };
         $scope.currentUser = AuthService.getCurrentUser();
         $scope.apiEndpoint = window.location.origin;
 
         $scope.loadDashboardData = function () {
-            // 🔍 Prevent admin from calling client APIs
+            // FIXED: Prevent admin from calling client APIs
             if ($scope.currentUser.role === 'Admin') {
-                $scope.balance = { creditBalance: 0 };
-                $scope.summary = { totalRequests: 0, successRate: 0 };
-                return; // Stop here, skip API calls
+                console.log('Admin user detected, skipping client API calls');
+                return;
+            }
+
+            // FIXED: Check if clientId exists
+            if (!$scope.currentUser.clientId) {
+                console.error('No clientId found for user');
+                $scope.$parent.showAlert('Client ID not found. Please contact administrator.', 'danger');
+                return;
             }
 
             $scope.$parent.loading = true;
@@ -23,8 +33,10 @@
             ]).then(function (responses) {
                 $scope.balance = responses[0].data;
                 $scope.summary = responses[1].data;
+                $scope.$applyAsync();
             }).catch(function (error) {
-                $scope.$parent.showAlert('Failed to load dashboard data', 'danger');
+                console.error('Dashboard load error:', error);
+                $scope.$parent.showAlert('Failed to load dashboard data. Please try again.', 'danger');
             }).finally(function () {
                 $scope.$parent.loading = false;
                 $scope.$applyAsync();
@@ -36,18 +48,36 @@
         };
 
         $scope.copyApiKey = function () {
-            if ($scope.currentUser.role === 'Admin') return; // admin doesn't have client api key
+            if ($scope.currentUser.role === 'Admin') {
+                $scope.$parent.showAlert('Admin users do not have API keys', 'info');
+                return;
+            }
+
+            if (!$scope.currentUser.clientId) {
+                $scope.$parent.showAlert('Client ID not found', 'danger');
+                return;
+            }
 
             ApiService.get('/clients/' + $scope.currentUser.clientId)
                 .then(function (response) {
                     var apiKey = response.data.apiKey;
                     navigator.clipboard.writeText(apiKey).then(function () {
                         $scope.$parent.showAlert('API Key copied to clipboard!', 'success');
+                    }).catch(function (err) {
+                        console.error('Copy failed:', err);
+                        $scope.$parent.showAlert('Failed to copy API key', 'danger');
                     });
+                })
+                .catch(function (error) {
+                    console.error('Failed to get API key:', error);
+                    $scope.$parent.showAlert('Failed to retrieve API key', 'danger');
                 });
         };
 
-        $scope.loadDashboardData();
+        // Only load data if user is a client
+        if ($scope.currentUser.role === 'Client') {
+            $scope.loadDashboardData();
+        }
     }])
 
     // Client Credits Controller

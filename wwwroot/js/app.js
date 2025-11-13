@@ -125,23 +125,42 @@ var app = angular.module('apiResellerApp', ['ngRoute'])
         });
     }]);
 
-// Filters
+// Filters - UPDATED FOR INR
 app.filter('currency', function () {
     return function (amount) {
-        if (amount === null || amount === undefined) return '$0.00';
-        return '$' + parseFloat(amount).toFixed(2);
+        if (amount === null || amount === undefined) return '₹0.00';
+
+        // Format number with Indian currency format (lakhs/crores)
+        var num = parseFloat(amount).toFixed(2);
+        var parts = num.toString().split(".");
+
+        // Indian number formatting: XX,XX,XXX.XX
+        var lastThree = parts[0].substring(parts[0].length - 3);
+        var otherNumbers = parts[0].substring(0, parts[0].length - 3);
+
+        if (otherNumbers !== '') {
+            lastThree = ',' + lastThree;
+        }
+
+        var formatted = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+
+        if (parts.length > 1) {
+            formatted += "." + parts[1];
+        }
+
+        return '₹' + formatted;
     };
 })
     .filter('dateFormat', function () {
         return function (dateString) {
             if (!dateString) return '';
-            return new Date(dateString).toLocaleDateString();
+            return new Date(dateString).toLocaleDateString('en-IN');
         };
     })
     .filter('dateTimeFormat', function () {
         return function (dateString) {
             if (!dateString) return '';
-            return new Date(dateString).toLocaleString();
+            return new Date(dateString).toLocaleString('en-IN');
         };
     });
 

@@ -154,13 +154,13 @@ static async Task SeedInitialData(ApplicationDbContext context, bool isDevelopme
             var setting = new SystemSettings
             {
                 SettingKey = "REQUEST_COST",
-                SettingValue = "0.01",
+                SettingValue = "1.00",
                 UpdatedAt = DateTime.UtcNow
             };
             context.SystemSettings.Add(setting);
             await context.SaveChangesAsync();
 
-            Console.WriteLine("⚙️  Default System Setting Added: REQUEST_COST = 0.01");
+            Console.WriteLine("⚙️  Default System Setting Added: REQUEST_COST = ₹1.00");
         }
 
         // Seed Demo Client (only in development)
@@ -188,7 +188,7 @@ static async Task SeedInitialData(ApplicationDbContext context, bool isDevelopme
                 Address = "123 Demo Street",
                 ApiKey = "ak_demo123456789",
                 ApiSecret = "as_demo987654321",
-                CreditBalance = 10.00m,
+                CreditBalance = 1000.00m,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -198,7 +198,7 @@ static async Task SeedInitialData(ApplicationDbContext context, bool isDevelopme
             var initialCredit = new ClientCredit
             {
                 ClientId = demoClient.Id,
-                Amount = 10.00m,
+                Amount = 1000.00m,
                 TransactionType = "Recharge",
                 Description = "Initial demo credit",
                 CreatedAt = DateTime.UtcNow
@@ -206,7 +206,7 @@ static async Task SeedInitialData(ApplicationDbContext context, bool isDevelopme
             context.ClientCredits.Add(initialCredit);
             await context.SaveChangesAsync();
 
-            Console.WriteLine("👤 Demo Client Created: democlient / demo123 ($10 credit)");
+            Console.WriteLine("👤 Demo Client Created: democlient / demo123 (₹1000 credit)");
         }
     }
     catch (Exception ex)

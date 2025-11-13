@@ -1,19 +1,35 @@
 ﻿angular.module('apiResellerApp')
-    .service('ApiService', ['$http', '$rootScope', function ($http, $rootScope) {
-
-        // HTTP interceptor for error handling
-        var self = this;
+    .service('ApiService', ['$http', '$rootScope', '$q', function ($http, $rootScope, $q) {
 
         function handleError(error) {
             console.error('API Error:', error);
-            $rootScope.$broadcast('httpError', {
+
+            // Create a more detailed error object
+            var errorDetails = {
                 status: error.status,
-                message: error.data?.message || 'An error occurred'
-            });
-            return Promise.reject(error);
+                statusText: error.statusText,
+                message: 'An error occurred',
+                url: error.config ? error.config.url : 'unknown'
+            };
+
+            // Handle different error types
+            if (error.status === -1) {
+                errorDetails.message = 'Cannot connect to server. Please check if the server is running.';
+            } else if (error.status === 401) {
+                errorDetails.message = 'Unauthorized. Please login again.';
+            } else if (error.status === 403) {
+                errorDetails.message = 'Access forbidden. You do not have permission to access this resource.';
+            } else if (error.status === 404) {
+                errorDetails.message = 'Resource not found.';
+            } else if (error.data && error.data.message) {
+                errorDetails.message = error.data.message;
+            }
+
+            $rootScope.$broadcast('httpError', errorDetails);
+            return $q.reject(error);
         }
 
-        // Generic HTTP methods
+        // Generic HTTP methods with better error handling
         this.get = function (url, params) {
             var config = params ? { params: params } : {};
             return $http.get('/api' + url, config).catch(handleError);
@@ -33,9 +49,7 @@
 
         // Admin API methods
         this.getClients = function () {
-            return this.get('/clients').then(function (response) {
-                return response; // Return response for promise chain
-            });
+            return this.get('/clients');
         };
 
         this.createClient = function (clientData) {
@@ -111,7 +125,6 @@
 
         // Dashboard methods
         this.getAdminDashboardStats = function () {
-            // For admin dashboard - can combine multiple calls
             return Promise.all([
                 this.getClients(),
                 this.getSystemSettings()

@@ -33,7 +33,7 @@
 
                 // Find low credit clients (less than $5)
                 $scope.lowCreditClients = clients.filter(function (c) {
-                    return c.isActive && c.creditBalance < 5;
+                    return c.isActive && c.creditBalance < 500;
                 });
 
                 $scope.$apply();
