@@ -43,14 +43,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 // HttpClient (for proxy API requests)
-builder.Services.AddHttpClient();
+//builder.Services.AddHttpClient();
 
-// CORS Policy
+//// CORS Policy
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowFrontend", policy =>
+//    {
+//        policy.WithOrigins("http://localhost:5291", "http://localhost:3000")
+//              .AllowAnyHeader()
+//              .AllowAnyMethod()
+//              .AllowCredentials();
+//    });
+//});
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5291", "http://localhost:3000")
+        policy.SetIsOriginAllowed(origin => true) // Allow any origin for testing
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
